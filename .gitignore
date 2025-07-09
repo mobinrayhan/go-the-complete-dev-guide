@@ -1,0 +1,49 @@
+# Go build artifacts
+*.exe
+*.test
+*.out
+*.o
+*.a
+*.so
+
+# Binaries
+bin/
+build/
+dist/
+
+# Go module/vendor directories (optional, if not needed)
+vendor/
+
+# IDE/editor config
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# macOS system files
+.DS_Store
+
+# Logs & debugging
+*.log
+*.tmp
+*.temp
+
+# Coverage/testing
+coverage.out
+
+# Dependency tools (if used)
+go.sum
+
+# Secrets / Environment files (if ever used)
+.env
+.env.*
+
+# Crash reports
+*.core
+
+# Node/npm (only if you use it for frontend or tooling)
+node_modules/
+
+# Thumbs.db (Windows)
+Thumbs.db
