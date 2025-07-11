@@ -1,0 +1,43 @@
+// package main
+
+// import (
+// 	"fmt"
+// 	"math"
+// )
+
+// func main() {
+// 	revenue := getPromptWithLabel("Enter the revenue: ")
+// 	expenses := getPromptWithLabel("Enter the expenses: ")
+// 	taxRate := getPromptWithLabel("Enter the tax rate (as a percentage): ")
+
+// 	earningBeforeTax, profit, ratio := calculateFinancial(revenue, expenses, taxRate)
+
+// 	fmt.Println("Profit Calculator")
+// 	fmt.Printf("Earning Before Tax: $%.2f\n", earningBeforeTax)
+// 	fmt.Printf("Earning After Tax: $%.2f\n", profit)
+// 	fmt.Printf("Profit Ratio: %.2f\n", ratio)
+// 	fmt.Println("Just testing math function ", math.Pow(2, 3))
+// 	fmt.Print(greet("Mobin"))
+// }
+
+// func calculateFinancial(revenue, expenses, taxRate float64) (float64, float64, float64) {
+// 	earningBeforeTax := revenue - expenses
+// 	profit := earningBeforeTax - (earningBeforeTax * taxRate / 100)
+// 	ratio := earningBeforeTax / profit
+// 	return earningBeforeTax, profit, ratio
+// }
+
+// func getPromptWithLabel(labelName string) float64 {
+// 	var promptNumber float64
+
+// 	fmt.Print(labelName)
+// 	fmt.Scan(&promptNumber)
+
+// 	return promptNumber
+// }
+
+// func greet(name string) (gs, bagGr string) {
+// 	gs = "Hello " + name + " Welcome to golang greet function ! \n"
+// 	bagGr = "Hello " + name + " You are A very bad guy!"
+// 	return gs, bagGr
+// }
