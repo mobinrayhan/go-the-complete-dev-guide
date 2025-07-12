@@ -1,12 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"mobin.dev/multiplication_table_generator/fileWriter"
+)
 
 const MULTIPLICATION_LENGTH = 10
+const fileName = "multiplication.txt"
 
 func main() {
 	userInput := 1
-
 	fmt.Print("Enter Your Favorite Number : ")
 	_, err := fmt.Scanf("%d", &userInput)
 
@@ -15,14 +19,13 @@ func main() {
 		panic(err)
 	}
 
-	for i := 1; i <= MULTIPLICATION_LENGTH; i++ {
-		formattedText := fmt.Sprintf("%d X %d = %d \n", userInput, i, i*userInput)
-		fmt.Print(formattedText)
-		// fmt.Printf("%d X %d = %d \n", userInput, i, i*userInput)
-	}
+	finalStr := printMultiplicationTable(userInput)
+	existingFileData, err := fileWriter.GetValueFromFile(fileName)
 
-	// for i := range MULTIPLICATION_LENGTH {
-	// 	// formatted =
-	// 	fmt.Printf("%d X %d = %d \n", userInput, i, i*userInput)
-	// }
+	if err != nil {
+		fileWriter.WriteValueToFile(fileName, finalStr)
+	} else {
+		existingFormattedData := fmt.Sprintf("%s--------------------\n", existingFileData)
+		fileWriter.WriteValueToFile(fileName, existingFormattedData+finalStr)
+	}
 }
