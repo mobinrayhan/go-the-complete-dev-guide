@@ -1,3 +1,3 @@
-module example.com/basics-practice
+module mobin.dev/budget_calculator
 
-go 1.21.2
+go 1.24.5
