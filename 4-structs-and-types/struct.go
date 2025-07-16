@@ -1,34 +1,49 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
 
-type Person struct {
-	FirstName string
-	LastName  string
-	Age       int
-}
+	bankaccount "mobin.dev/practice/bank-account"
+	"mobin.dev/practice/input"
+)
 
 func main() {
-	user := Person{
-		FirstName: "Mobin",
-		LastName:  "Rayhan",
-		Age:       25,
+	var ownerName string
+	amount, amountErr := input.GetInputValue("Enter Balance")
+	fmt.Print("Enter Your Name : ")
+	fmt.Scan(&ownerName)
+
+	if amountErr != nil {
+		fmt.Println(amountErr)
+		panic(amountErr)
 	}
 
-	fmt.Print(user)
-	birthday(&user)
-	// birthday(&user)
-	// birthday(&user)
-	// birthday(&user)
-	// birthday(&user)
-	// birthday(&user)
+	accUser := bankaccount.BankAccount{
+		Owner:   ownerName,
+		Balance: &amount,
+	}
+	fmt.Printf("HI %s, Your Account Balance %.2f\n", ownerName, amount)
 
-	fmt.Println(user)
-	// user.FirstName = "Mobin"
-	// user.LastName = "Rayhan"
-	// user.Age = 22
-}
+	fmt.Println("Chose One Prompt Here : ")
+	fmt.Println("1. Withdraw Money")
+	fmt.Println("2. Deposit Money")
 
-func birthday(p *Person) {
-	p.Age += 1
+	promptChose, optionChooseErr := input.GetInputValue("Choosing Options : ")
+
+	if optionChooseErr != nil {
+		fmt.Println(optionChooseErr)
+		panic(optionChooseErr)
+	}
+
+	if promptChose == 1 {
+		widthRawAmount, _ := input.GetInputValue("Withdraw ")
+		accUser.Withdraw(widthRawAmount)
+
+	} else if promptChose == 2 {
+		depositAmount, _ := input.GetInputValue("Deposit ")
+		accUser.Deposit(depositAmount)
+		// fmt.Println(depositAmount)
+	}
+
+	fmt.Println(accUser.MainBalance())
 }
