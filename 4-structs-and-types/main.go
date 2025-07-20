@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	fsjson "mobin.dev/personal_library_manager_cli/fs-json"
 	"mobin.dev/personal_library_manager_cli/models"
 )
 
@@ -24,6 +25,8 @@ func main() {
 		fmt.Println(err)
 		panic(err)
 	}
+
+	fsjson.WriteToJson("books-list.json", newBook)
 
 	fmt.Println(newBook)
 }

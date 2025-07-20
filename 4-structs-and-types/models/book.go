@@ -10,12 +10,12 @@ import (
 )
 
 type Book struct {
-	Title         string
-	Author        string
-	Pages         int
-	PublishedYear int
-	IsRead        bool
-	ShortReview   string
+	Title         string `json:"name"`
+	Author        string `json:"author"`
+	Pages         int    `json:"pages"`
+	PublishedYear int    `json:"publishedYear"`
+	IsRead        bool   `json:"isRead"`
+	ShortReview   string `json:"shortReview"`
 }
 
 const MAX_LENGTH_OF_REVIEW_TEXT = 200
