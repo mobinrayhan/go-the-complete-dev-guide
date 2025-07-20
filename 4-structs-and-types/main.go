@@ -7,25 +7,22 @@ import (
 )
 
 func main() {
+	title, author, pagesNumber, convertedPublishedYear, shortReview := models.BookInputs()
 
-	book := models.Book{
-		Title: "Javascript Definition Guide!",
-		// Title:         "",
-		Author: "Mobin",
-		// Author:        "",
-		Pages: 200,
-		// Pages:         0,
-		PublishedYear: 2004,
-		IsRead:        true,
-		// ShortReview:   "Hello This is short Review",
-		ShortReview: "In Go, fmt.Sprintf is a function within the fm data according to a format specifier and returns the resulting Sprintf.",
+	bookStruct := models.Book{
+		Title:         title,
+		Author:        author,
+		Pages:         pagesNumber,
+		PublishedYear: convertedPublishedYear,
+		ShortReview:   shortReview,
+		IsRead:        false,
 	}
 
-	newBook, newBookErr := book.New(book)
+	newBook, err := bookStruct.New(bookStruct)
 
-	if newBookErr != nil {
-		fmt.Println(newBookErr)
-		panic(newBookErr)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
 	}
 
 	fmt.Println(newBook)
