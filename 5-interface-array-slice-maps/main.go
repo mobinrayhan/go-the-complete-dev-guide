@@ -1,27 +1,32 @@
 package main
 
 import (
-	"mobin.dev/inteface_practice/consolePrinter"
-	"mobin.dev/inteface_practice/pdfPrinter"
+	"fmt"
+
+	"mobin.dev/inteface_practice/circle"
+	"mobin.dev/inteface_practice/rectangle"
 )
 
-type printer interface {
-	Printer()
+type area interface {
+	Area() float64
 }
 
 func main() {
-	pdfPrint := pdfPrinter.PDFPrinter{
-		Data: "Hello This is PDF printer",
+	newCircle := circle.Circle{
+		Radius: 500,
 	}
 
-	conPrint := consolePrinter.ConsolePrinter{
-		Data: "Hello This is ConsolePrinter",
+	newRectangle := rectangle.Rectangle{
+		Length: 20,
+		Width:  30,
 	}
 
-	printPrinter(pdfPrint)
-	printPrinter(conPrint)
+	getArea(newCircle)
+	getArea(newRectangle)
+
 }
 
-func printPrinter(p printer) {
-	p.Printer()
+func getArea(a area) {
+	returnedArea := a.Area()
+	fmt.Println(returnedArea)
 }
