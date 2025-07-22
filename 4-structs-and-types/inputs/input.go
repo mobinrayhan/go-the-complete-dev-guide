@@ -12,7 +12,7 @@ func GetUserInput(label string) (string, error) {
 	fmt.Print(label, " : ")
 	reader := bufio.NewReader(os.Stdin)
 	userInput, err := reader.ReadString('\n')
-	userInput = strings.TrimSuffix(userInput, "/n")
+	userInput = strings.TrimSuffix(userInput, "\n")
 
 	if err != nil {
 		return "", errors.New("invalid user input")
