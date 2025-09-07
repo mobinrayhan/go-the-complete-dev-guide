@@ -1,103 +1,64 @@
 package main
 
-import (
-	"fmt"
-	"math"
-)
+import "fmt"
 
-type MakeAppear func(string) string
-
-func main() {
-
-	innerFn := makeAppear("Hello world")
-
-	fmt.Println(innerFn("MOBIN"))
-
-	fmt.Println(factorial(5))
-
-	fmt.Println(fibonacci(6))
-
-	fmt.Println(math.Round(avg(10, 20)))
-	fmt.Println(math.Round(avg(10, 20, 54, 79, 30)))
-	fmt.Println(max(10, 20, 54, 79, 30))
-
-	numbers := []int{1, 2, 3, 4, 5}
-	fmt.Println(sum(numbers...)) // Use slice splitting
+func sayHelloWorld(name string) {
+	fmt.Printf("Hello %s\n", name)
 }
 
-func makeAppear(base string) MakeAppear {
-	return func(innerStr string) string {
-		return innerStr + " " + base
+func evenOrOd(input int) {
+	if (input % 2) == 1 {
+		fmt.Println("Its Odd Number")
+	} else {
+		fmt.Println("Its Even Number")
 	}
 }
 
-func factorial(n int) int {
-	// factNumber := 1
-	// for i := 1; i <= n; i++ {
-	// 	factNumber *= i
-	// }
-
-	// return factNumber
-
-	if n == 0 {
-		return 1
+func sum(nums []int) int {
+	var sumValue int = 0
+	for _, v := range nums {
+		sumValue += v
 	}
-
-	return n * factorial(n-1)
-
-}
-
-func fibonacci(n int) int {
-
-	prev, curr := 0, 1
-
-	for i := 2; i < n; i++ {
-		next := prev + curr
-		prev = curr
-		curr = next
-	}
-
-	return curr
-
-}
-
-func avg(nums ...float64) float64 {
-
-	totalMoney := 0.0
-	totalNumbers := len(nums)
-
-	for i := 0; i < totalNumbers; i++ {
-		totalMoney += nums[i]
-	}
-	return totalMoney / float64(totalNumbers)
-}
-
-func max(values ...int) int {
-
-	maxValue := values[0]
-
-	for _, value := range values {
-
-		if maxValue < value {
-			maxValue = value
-		}
-	}
-
-	return maxValue
-}
-
-func sum(nums ...int) int {
-	sumValue := 0
-	for _, value := range nums {
-		sumValue += value
-	}
-
 	return sumValue
 }
 
-// 5 * 24 = 120
-// 4 * (3 * 2) = 6
-// 3 * 2
-// 2 * 1
-// 1 * 1
-// ret -> 1
+func reverseString(input string) string {
+	// V1
+	var revString string = ""
+
+	// for _, v := range input {
+	// 	value := fmt.Sprintf("%c", v)
+	// 	revString = value + revString
+	// }
+
+	// return revString
+
+	for i := 0; i < len(input); i++ {
+		value := fmt.Sprintf("%c", input[i])
+		revString = value + revString
+	}
+	return revString
+}
+
+func factorial(input int) int {
+	var factTotal int = 1
+	for i := 1; i < input; i++ {
+		factTotal *= input
+	}
+	return factTotal
+}
+
+func main() {
+	sayHelloWorld("Mobin")
+	evenOrOd(545)
+
+	array := []int{10, 20, 30, 40, 50}
+
+	totalSum := sum(array)
+	fmt.Println(totalSum)
+
+	revString := reverseString("Hello World")
+	fmt.Println(revString)
+
+	fmt.Println(factorial)
+}

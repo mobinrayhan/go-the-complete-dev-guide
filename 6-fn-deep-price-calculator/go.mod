@@ -1,3 +1,3 @@
-module mobin.dev/fn-deep
+module mobin.dev/practice
 
 go 1.24.5
