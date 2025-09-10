@@ -5,14 +5,20 @@ import (
 	"mobin.dev/internal/repository"
 )
 
-var events = repository.NewEventsRepo()
-
-func GetAllEvents() []models.Event {
-	events := events.FetchAllEvents()
-	return events
+type EventService struct {
+	repo repository.EventsRepo
 }
 
-func GetEvent() models.Event {
-	event := events.FetchEvent()
+func NewEventsService(repo repository.EventsRepo) EventService {
+	return EventService{repo: repo}
+}
+
+func (e EventService) GetAllEvents() []models.Event {
+	allEvents := e.repo.FetchAllEvents()
+	return allEvents
+}
+
+func (e EventService) GetEvent() models.Event {
+	event := e.repo.FetchEvent()
 	return event
 }

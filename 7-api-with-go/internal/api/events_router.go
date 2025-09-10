@@ -1,14 +1,19 @@
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"mobin.dev/internal/handlers"
+	"mobin.dev/internal/service"
+)
 
-func RegisterEventsRouter(r *gin.Engine) {
+func RegisterEventsRouter(r *gin.Engine, e service.EventService) {
+	h := handlers.NewEventHandler(e)
 
 	eventsGroup := r.Group("/events")
 
 	{
-		eventsGroup.GET("/", GetEvents)
-		eventsGroup.GET("/:id", GetEvent)
+		eventsGroup.GET("/", h.GetEvents)
+		eventsGroup.GET("/:id", h.GetEvent)
 	}
 
 }
