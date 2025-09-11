@@ -1,11 +1,7 @@
 package main
 
-import (
-	"mobin.dev/internal/app"
-	"mobin.dev/pkg/config"
-)
+import "fmt"
 
 func main() {
-	conf := config.Load()
-	app.RunServer(conf)
+	fmt.Println("Hello World")
 }
