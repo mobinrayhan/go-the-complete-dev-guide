@@ -20,6 +20,7 @@ func Connect(c *config.Config) (*sql.DB, error) {
 		Net:                  "tcp",
 		Addr:                 fmt.Sprintf("%s:%d", c.DbHost, c.DbPort),
 	}
+	fmt.Println(cfg.FormatDSN())
 
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {

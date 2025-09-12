@@ -15,9 +15,5 @@ func main() {
 		fmt.Println("Failed To Connect Db")
 		panic(err)
 	}
-
-	err = db.RunMigrations(mainDb)
-	fmt.Print(err)
-
 	defer mainDb.Close()
 }
