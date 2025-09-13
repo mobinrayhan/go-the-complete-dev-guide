@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
@@ -25,6 +26,7 @@ func main() {
 	down := flag.Int("down", 0, "Rollback N migrations (e.g., -down 1)")
 	force := flag.Int("force", -1, "Set DB schema to specific version (e.g., -force 1)")
 	version := flag.Bool("version", false, "Show The Current Migrate Version")
+	seed := flag.Bool("seed", false, "Migrate latest Data To The Database!")
 	flag.Parse()
 
 	defer mainDb.Close()
@@ -66,6 +68,32 @@ func main() {
 			fmt.Println("📦 No migrations applied yet")
 		} else {
 			fmt.Printf("📦 Current version: %d (dirty: %v)\n", v, dirty)
+		}
+	case *seed:
+		seedDir := "./internals/db/seeds"
+		files, err := filepath.Glob(seedDir + "/*seed.sql")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, file := range files {
+			fmt.Println("Running Seed ... :", file)
+			content, err := os.ReadFile(file)
+
+			if err != nil {
+				log.Fatalf("Error reading file : %v", err)
+			}
+
+			if string(content) == "" {
+				fmt.Println("⚠️ Seed File Is Empty", file)
+			} else {
+				_, err = mainDb.Exec(string(content))
+
+				if err != nil {
+					log.Fatalf("Failed to run seed %s: %v", file, err)
+				}
+				fmt.Println("✅ Seed applied idempotently", file)
+			}
 		}
 
 	default:

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/go-sql-driver/mysql"
-	_ "github.com/go-sql-driver/mysql"
 	"mobin.dev/pkg/config"
 )
 
@@ -19,6 +18,7 @@ func Connect(c *config.Config) (*sql.DB, error) {
 		ParseTime:            true,
 		Net:                  "tcp",
 		Addr:                 fmt.Sprintf("%s:%d", c.DbHost, c.DbPort),
+		MultiStatements:      true,
 	}
 	fmt.Println(cfg.FormatDSN())
 

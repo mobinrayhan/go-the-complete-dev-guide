@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"mobin.dev/internals/app"
 	"mobin.dev/internals/db"
 	"mobin.dev/pkg/config"
 )
@@ -16,4 +17,5 @@ func main() {
 		panic(err)
 	}
 	defer mainDb.Close()
+	app.RunServer(config.AppConfig)
 }

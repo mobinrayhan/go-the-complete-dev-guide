@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"strconv"
 
@@ -14,12 +15,14 @@ type Config struct {
 	DbHost     string
 	DBUserName string
 	Port       int
+	AppEnv     string
 }
 
 var AppConfig *Config
 
 func Load() {
-
+	appMode := flag.String("mode", "development", "Mode Of Your App, It Should Be Dev Or Production!")
+	flag.Parse()
 	env, err := godotenv.Read()
 
 	if err != nil {
@@ -32,7 +35,7 @@ func Load() {
 	DbPort, _ := strconv.Atoi(env["DB_PORT"])
 	DbHost := env["DB_HOST"]
 	DBUserName := env["DB_USER"]
-	Port, _ := strconv.Atoi(env["Port"])
+	Port, _ := strconv.Atoi(env["PORT"])
 
 	AppConfig = &Config{
 		DBName:     DBName,
@@ -41,6 +44,7 @@ func Load() {
 		DbHost:     DbHost,
 		DBUserName: DBUserName,
 		Port:       Port,
+		AppEnv:     *appMode,
 	}
-	fmt.Println("Config loaded successfully ✅")
+	fmt.Println("Config loaded successfully ✅", *appMode)
 }

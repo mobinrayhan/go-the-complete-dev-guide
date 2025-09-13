@@ -14,3 +14,15 @@ migrate-version:
 
 migrate-new:
 	migrate create -ext sql -dir ./internals/db/migrations -seq $(name)
+	
+seed:
+	go run cmd/migrate/main.go -seed
+
+build:
+	go build -o ./build/main ./cmd/server
+
+run-prod:
+	./build/main -mode=production
+	
+run-dev:
+	air -c .air.toml
