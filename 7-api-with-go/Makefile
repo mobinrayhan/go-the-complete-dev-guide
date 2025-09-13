@@ -5,7 +5,8 @@ migrate-down:
 	go run cmd/migrate/main.go -down 1
 
 migrate-force:
-	go run cmd/migrate/main.go -force 1
+	MIGRATE_VERSION ?= -1;
+	go run cmd/migrate/main.go -force $(MIGRATE_VERSION)
 
 migrate-version:
 	go run cmd/migrate/main.go -version

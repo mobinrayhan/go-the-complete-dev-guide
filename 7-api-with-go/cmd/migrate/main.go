@@ -52,7 +52,7 @@ func main() {
 			log.Fatalf("Migration Down Failed : %v", err)
 		}
 		fmt.Printf("✅ Rolled Back %d migrations(s)\n", *down)
-	case *force > 0:
+	case *force >= 0:
 		if err := m.Force(*force); err != nil && err != migrate.ErrNoChange {
 			log.Fatalf("Force migration failed: %v", err)
 		}
