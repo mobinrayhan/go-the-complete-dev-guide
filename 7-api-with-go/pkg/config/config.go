@@ -1,11 +1,18 @@
 package config
 
 import (
-	"flag"
 	"fmt"
+	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
+)
+
+const (
+	PRODUCTION  = "production"
+	DEVELOPMENT = "development"
+	STAGING     = "staging"
 )
 
 type Config struct {
@@ -20,22 +27,39 @@ type Config struct {
 
 var AppConfig *Config
 
+func IsProduction() bool {
+	if AppConfig == nil {
+		panic("AppConfig Is Nill Please Load Config Before Call This Function")
+	}
+	return AppConfig.AppEnv == PRODUCTION
+}
+func IsDevelopment() bool {
+	if AppConfig == nil {
+		panic("AppConfig Is Nill Please Load Config Before Call This Function")
+	}
+	return AppConfig.AppEnv == DEVELOPMENT
+}
+
 func Load() {
-	appMode := flag.String("mode", "development", "Mode Of Your App, It Should Be Dev Or Production!")
-	flag.Parse()
-	env, err := godotenv.Read()
+	err := godotenv.Load("envs/dev.env")
 
 	if err != nil {
 		fmt.Println("Failed to load ENV")
 		panic(err)
 	}
 
-	DBName := env["DB_NAME"]
-	DbPassword := env["DB_PASS"]
-	DbPort, _ := strconv.Atoi(env["DB_PORT"])
-	DbHost := env["DB_HOST"]
-	DBUserName := env["DB_USER"]
-	Port, _ := strconv.Atoi(env["PORT"])
+	DBName := os.Getenv("DB_NAME")
+	DbPassword := os.Getenv("DB_PASS")
+	DbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
+	DbHost := os.Getenv("DB_HOST")
+	DBUserName := os.Getenv("DB_USER")
+	Port, _ := strconv.Atoi(os.Getenv("PORT"))
+	AppEnv := os.Getenv("APP_ENV")
+	AppEnv = strings.ToLower(strings.TrimSpace(AppEnv))
+
+	if AppEnv == "" {
+		AppEnv = DEVELOPMENT
+	}
 
 	AppConfig = &Config{
 		DBName:     DBName,
@@ -44,7 +68,7 @@ func Load() {
 		DbHost:     DbHost,
 		DBUserName: DBUserName,
 		Port:       Port,
-		AppEnv:     *appMode,
+		AppEnv:     AppEnv,
 	}
-	fmt.Println("Config loaded successfully ✅", *appMode)
+	fmt.Println("Config loaded successfully ✅")
 }

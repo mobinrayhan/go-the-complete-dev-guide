@@ -70,8 +70,12 @@ func main() {
 			fmt.Printf("📦 Current version: %d (dirty: %v)\n", v, dirty)
 		}
 	case *seed:
-		seedDir := "./internals/db/seeds"
+		seedDir := "./internals/db/seeds/dev"
+		if config.IsProduction() {
+			seedDir = "./internals/db/seeds/prod"
+		}
 		files, err := filepath.Glob(seedDir + "/*seed.sql")
+
 		if err != nil {
 			log.Fatal(err)
 		}

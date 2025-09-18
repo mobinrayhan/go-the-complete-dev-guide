@@ -1,4 +1,5 @@
 MIGRATE_VERSION ?= -1;
+ENV ?= development;
 
 migrate-up:
 	go run cmd/migrate/main.go -up
@@ -16,7 +17,7 @@ migrate-new:
 	migrate create -ext sql -dir ./internals/db/migrations -seq $(name)
 	
 seed:
-	go run cmd/migrate/main.go -seed
+	APP_ENV=$(ENV) go run cmd/migrate/main.go -seed
 
 build:
 	go build -o ./build/main ./cmd/server

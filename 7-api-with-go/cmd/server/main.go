@@ -17,5 +17,5 @@ func main() {
 		panic(err)
 	}
 	defer mainDb.Close()
-	app.RunServer(config.AppConfig)
+	app.RunServer(config.AppConfig, mainDb)
 }
