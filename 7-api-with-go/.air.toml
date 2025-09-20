@@ -1,0 +1,11 @@
+root = "."
+
+[build]
+bin = "./tmp/main"
+cmd = "go build -o ./tmp/main ./cmd/server/main.go"
+
+[color]
+build = "yellow"
+main = "magenta"
+runner = "green"
+watcher = "cyan"

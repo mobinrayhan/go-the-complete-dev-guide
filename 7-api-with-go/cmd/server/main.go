@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
 
-	"mobin.dev/internals/app"
 	"mobin.dev/internals/db"
 	"mobin.dev/pkg/config"
 )
@@ -13,9 +13,9 @@ func main() {
 	mainDb, err := db.Connect(config.AppConfig)
 
 	if err != nil {
-		fmt.Println("Failed To Connect Db")
-		panic(err)
+		fmt.Printf("❌ Failed to connect to DB: %v\n", err)
+		os.Exit(1)
 	}
+
 	defer mainDb.Close()
-	app.RunServer(config.AppConfig, mainDb)
 }

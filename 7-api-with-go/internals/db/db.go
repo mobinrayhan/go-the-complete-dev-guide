@@ -4,32 +4,26 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"mobin.dev/pkg/config"
 )
 
 func Connect(c *config.Config) (*sql.DB, error) {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		c.Host, c.DBPort, c.User, c.Password, c.DbName)
 
-	cfg := mysql.Config{
-		User:                 c.DBUserName,
-		Passwd:               c.DbPassword,
-		DBName:               c.DBName,
-		AllowNativePasswords: true,
-		ParseTime:            true,
-		Net:                  "tcp",
-		Addr:                 fmt.Sprintf("%s:%d", c.DbHost, c.DbPort),
-		MultiStatements:      true,
-	}
-	fmt.Println(cfg.FormatDSN())
+	db, err := sql.Open("postgres", psqlInfo)
 
-	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
-		return nil, fmt.Errorf("failed to open DB : %w", err)
+		return nil, fmt.Errorf("failed to open DB: %w ", err)
 	}
 
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("failed to ping db : %w", err)
+	if err = db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping DB : %w", err)
 	}
+
+	fmt.Println("DB Successfully connected! ✅")
 
 	return db, nil
 }

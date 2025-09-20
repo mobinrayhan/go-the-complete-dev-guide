@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -9,66 +10,57 @@ import (
 	"github.com/joho/godotenv"
 )
 
-const (
-	PRODUCTION  = "production"
-	DEVELOPMENT = "development"
-	STAGING     = "staging"
-)
-
 type Config struct {
-	DBName     string
-	DbPassword string
-	DbPort     int
-	DbHost     string
-	DBUserName string
-	Port       int
-	AppEnv     string
+	Host     string
+	Port     int
+	DBPort   int
+	User     string
+	Password string
+	DbName   string
+	AppEnv   string
 }
+
+const (
+	DEVELOPMENT = "development"
+	PRODUCTION  = "production"
+	STAGE       = "stage"
+)
 
 var AppConfig *Config
 
-func IsProduction() bool {
+func IsDevMode() bool {
 	if AppConfig == nil {
-		panic("AppConfig Is Nill Please Load Config Before Call This Function")
-	}
-	return AppConfig.AppEnv == PRODUCTION
-}
-func IsDevelopment() bool {
-	if AppConfig == nil {
-		panic("AppConfig Is Nill Please Load Config Before Call This Function")
+		panic("Please Call IsDevMode Function After Load Config")
 	}
 	return AppConfig.AppEnv == DEVELOPMENT
 }
 
+func IsProdMode() bool {
+	if AppConfig == nil {
+		fmt.Println("Please Call IsDevMode Function After Load Config")
+		return false
+	}
+	return AppConfig.AppEnv == PRODUCTION
+}
+
 func Load() {
-	err := godotenv.Load("envs/dev.env")
+	err := godotenv.Load("envs/.env.development")
 
 	if err != nil {
-		fmt.Println("Failed to load ENV")
-		panic(err)
+		log.Fatalf("failed to load env : %v ", err)
 	}
 
-	DBName := os.Getenv("DB_NAME")
-	DbPassword := os.Getenv("DB_PASS")
-	DbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
-	DbHost := os.Getenv("DB_HOST")
-	DBUserName := os.Getenv("DB_USER")
-	Port, _ := strconv.Atoi(os.Getenv("PORT"))
-	AppEnv := os.Getenv("APP_ENV")
-	AppEnv = strings.ToLower(strings.TrimSpace(AppEnv))
+	host := os.Getenv("HOST")
+	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("PASSWORD")
+	dbName := os.Getenv("DBNAME")
+	appEnv := strings.TrimSpace(strings.ToLower(os.Getenv("APP_ENV")))
 
-	if AppEnv == "" {
-		AppEnv = DEVELOPMENT
+	if appEnv == "" {
+		appEnv = DEVELOPMENT
 	}
 
-	AppConfig = &Config{
-		DBName:     DBName,
-		DbPassword: DbPassword,
-		DbPort:     DbPort,
-		DbHost:     DbHost,
-		DBUserName: DBUserName,
-		Port:       Port,
-		AppEnv:     AppEnv,
-	}
-	fmt.Println("Config loaded successfully ✅")
+	AppConfig = &Config{Host: host, Port: port, User: user, DBPort: dbPort, Password: password, DbName: dbName, AppEnv: appEnv}
 }

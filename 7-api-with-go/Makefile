@@ -1,29 +1,29 @@
-MIGRATE_VERSION ?= -1;
-ENV ?= development;
+N := 1
+RN := 1
+
+# ALL SERVER RELATED COMMANDS
+go-build:
+	go build -o build/main ./cmd/server/main.go
+
+# ALL MIGRATIONS COMMANDS
+migrate-new:
+	 migrate create -ext sql -dir ./internals/db/migrations -seq $(name)
 
 migrate-up:
-	go run cmd/migrate/main.go -up
-	
-migrate-down:
-	go run cmd/migrate/main.go -down 1
+	go run ./cmd/migrate/main.go -up
 
-migrate-force:
-	go run cmd/migrate/main.go -force $(MIGRATE_VERSION)
+migrate-down:
+	go run ./cmd/migrate/main.go -down $(N)
+
+migrate-reset:
+	go run ./cmd/migrate/main.go -reset $(RN)
 
 migrate-version:
-	go run cmd/migrate/main.go -version
+	go run ./cmd/migrate/main.go -version
 
-migrate-new:
-	migrate create -ext sql -dir ./internals/db/migrations -seq $(name)
-	
-seed:
-	APP_ENV=$(ENV) go run cmd/migrate/main.go -seed
+# ALL SEED COMMANDS
+seed-dev:
+	APP_ENV=development go run ./cmd/seed/main.go
 
-build:
-	go build -o ./build/main ./cmd/server
-
-run-prod:
-	./build/main -mode=production
-	
-run-dev:
-	air -c .air.toml
+seed-prod:
+	APP_ENV=production  go run ./cmd/seed/main.go
