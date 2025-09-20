@@ -1,4 +1,4 @@
-package v1
+package apiV1
 
 import (
 	"github.com/gin-gonic/gin"
@@ -10,5 +10,6 @@ func RegisterNotesRoutes(routes *gin.RouterGroup, h handler.NotesHandler) {
 
 	{
 		notes.GET("/", h.GetNotesHandler)
+		notes.GET("/:id", h.GetNoteHandler)
 	}
 }

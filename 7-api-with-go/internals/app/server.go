@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	v1 "mobin.dev/internals/api/v1"
+	apiV1 "mobin.dev/internals/api/v1"
 	"mobin.dev/internals/handler"
 	"mobin.dev/internals/repository"
 	"mobin.dev/internals/service"
@@ -23,7 +23,7 @@ func RunServer(c *config.Config, db *sql.DB) {
 	notesHandler := handler.NewNotesHandler(notesService)
 
 	{
-		v1.RegisterNotesRoutes(groupV1, *notesHandler)
+		apiV1.RegisterNotesRoutes(groupV1, *notesHandler)
 	}
 
 	fmt.Printf("App Running One : http://localhost:%d\n", c.Port)

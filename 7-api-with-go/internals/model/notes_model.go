@@ -7,7 +7,7 @@ type Note struct {
 	UserId    int
 	Title     string
 	Body      string
-	Tags      []string
+	Tags      interface{}
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
