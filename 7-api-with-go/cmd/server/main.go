@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"mobin.dev/internals/app"
 	"mobin.dev/internals/db"
 	"mobin.dev/pkg/config"
 )
@@ -17,5 +18,6 @@ func main() {
 		os.Exit(1)
 	}
 
+	app.RunServer(config.AppConfig, mainDb)
 	defer mainDb.Close()
 }
