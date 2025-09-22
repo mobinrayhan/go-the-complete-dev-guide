@@ -6,9 +6,15 @@ type ResponseMeta struct {
 	PerPages int `json:"perPage,omitempty"`
 	Limit    int `json:"limit,omitempty"`
 }
-type ApiResponse[T any] struct {
+type ApiResponseList[T any] struct {
 	Success bool          `json:"success,omitempty"`
-	Data    *T            `json:"data,omitempty"`
+	Data    T             `json:"data,omitempty"`
 	Message string        `json:"message,omitempty"`
 	Meta    *ResponseMeta `json:"meta,omitempty"`
+}
+
+type ApiResponseSingle[T any] struct {
+	Success bool   `json:"success,omitempty"`
+	Data    *T     `json:"data,omitempty"`
+	Message string `json:"message,omitempty"`
 }

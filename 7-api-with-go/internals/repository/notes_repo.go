@@ -1,8 +1,10 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"mobin.dev/internals/model"
@@ -18,8 +20,8 @@ func NewNotesRepo(db *sql.DB) *NotesRepo {
 	}
 }
 
-func (r *NotesRepo) FetchNotes() ([]model.Note, error) {
-	rows, err := r.db.Query(`
+func (r *NotesRepo) FetchNotes(ctx context.Context) ([]model.Note, error) {
+	rows, err := r.db.QueryContext(ctx, `
 				SELECT id, user_id, title, body, tags, created_at, updated_at
 					FROM notes
 				ORDER BY created_at DESC
@@ -55,7 +57,7 @@ func (r *NotesRepo) FetchNotes() ([]model.Note, error) {
 	return notes, nil
 }
 
-func (r *NotesRepo) FetchNote(id int) (*model.Note, error) {
+func (r *NotesRepo) FetchNote(ctx context.Context, id int) (*model.Note, error) {
 	fmt.Println(id)
 	row := r.db.QueryRow(`SELECT id, user_id, title, body, tags, created_at, updated_at
 					FROM notes WHERE id = $1`, id)
@@ -63,11 +65,17 @@ func (r *NotesRepo) FetchNote(id int) (*model.Note, error) {
 	var note model.Note
 	var tags json.RawMessage
 
-	if err := row.Scan(&note.Id, &note.UserId, &note.Title, &note.Body, &tags, &note.CreatedAt, &note.UpdatedAt); err != nil {
-		return nil, fmt.Errorf("failed to scan note : %w ", err)
+	err := row.Scan(&note.Id, &note.UserId, &note.Title, &note.Body, &tags, &note.CreatedAt, &note.UpdatedAt)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, sql.ErrNoRows
+		}
+		return nil, fmt.Errorf("failed to scan note: %w", err)
+
 	}
 
-	err := json.Unmarshal(tags, &note.Tags)
+	err = json.Unmarshal(tags, &note.Tags)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling JSON : %w", err)
 	}

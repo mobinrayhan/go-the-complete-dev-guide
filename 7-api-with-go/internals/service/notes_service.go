@@ -1,8 +1,18 @@
 package service
 
 import (
+	"context"
+	"database/sql"
+	"errors"
+	"fmt"
+
 	dtosV1 "mobin.dev/internals/dtos/v1"
 	"mobin.dev/internals/repository"
+)
+
+var (
+	ErrNoteNotFound     = errors.New("note not found")
+	ErrNotesFetchFailed = errors.New("failed to fetch notes")
 )
 
 type NotesService struct {
@@ -15,47 +25,28 @@ func NewNotesService(r *repository.NotesRepo) *NotesService {
 	}
 }
 
-func (s *NotesService) GetNotes() ([]dtosV1.NoteResponse, error) {
-
-	notes, err := s.r.FetchNotes()
-	notesRes := make([]dtosV1.NoteResponse, len(notes))
+func (s *NotesService) GetNotes(ctx context.Context) ([]dtosV1.NoteResponse, error) {
+	notes, err := s.r.FetchNotes(ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w : %v", ErrNotesFetchFailed, err)
 	}
 
-	for index, note := range notes {
-		notesRes[index] = dtosV1.NoteResponse{
-			Id:        note.Id,
-			UserId:    note.UserId,
-			Title:     note.Title,
-			Body:      note.Body,
-			Tags:      note.Tags,
-			CreatedAt: note.CreatedAt,
-			UpdatedAt: note.UpdatedAt,
-		}
-	}
-
-	return notesRes, nil
+	return dtosV1.ToNoteResponses(notes), nil
 }
 
-func (s *NotesService) GetNote(id int) (*dtosV1.NoteResponse, error) {
+func (s *NotesService) GetNote(ctx context.Context, id int) (*dtosV1.NoteResponse, error) {
 
-	note, err := s.r.FetchNote(id)
+	note, err := s.r.FetchNote(ctx, id)
 
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoteNotFound
+		}
 		return nil, err
 	}
 
-	noteRes := dtosV1.NoteResponse{
-		Id:        note.Id,
-		UserId:    note.UserId,
-		Title:     note.Title,
-		Body:      note.Body,
-		Tags:      note.Tags,
-		CreatedAt: note.CreatedAt,
-		UpdatedAt: note.UpdatedAt,
-	}
+	noteRes := dtosV1.ToNoteResponse(*note)
 
 	return &noteRes, nil
 }

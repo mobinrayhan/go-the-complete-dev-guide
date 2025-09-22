@@ -3,11 +3,11 @@ package dtosV1
 import "time"
 
 type NoteResponse struct {
-	Id        int         `json:"id"`
-	UserId    int         `json:"userId"`
-	Title     string      `json:"title"`
-	Body      string      `json:"body"`
-	Tags      interface{} `json:"tags"`
-	CreatedAt time.Time   `json:"createdAt"`
-	UpdatedAt time.Time   `json:"updatedAt"`
+	Id        int         `json:"id,omitempty"`
+	UserId    int         `json:"userId,omitempty"`
+	Title     string      `json:"title,omitempty"`
+	Body      string      `json:"body,omitempty"`
+	Tags      interface{} `json:"tags,omitempty"`
+	CreatedAt time.Time   `json:"createdAt,omitempty"`
+	UpdatedAt time.Time   `json:"updatedAt,omitempty"`
 }
