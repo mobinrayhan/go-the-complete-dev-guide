@@ -25,14 +25,14 @@ func NewNotesService(r *repository.NotesRepo) *NotesService {
 	}
 }
 
-func (s *NotesService) GetNotes(ctx context.Context) ([]dtosV1.NoteResponse, error) {
-	notes, err := s.r.FetchNotes(ctx)
+func (s *NotesService) GetNotes(ctx context.Context) ([]dtosV1.NoteResponse, int, error) {
+	notes, total, err := s.r.FetchNotes(ctx)
 
 	if err != nil {
-		return nil, fmt.Errorf("%w : %v", ErrNotesFetchFailed, err)
+		return nil, total, fmt.Errorf("%w : %v", ErrNotesFetchFailed, err)
 	}
 
-	return dtosV1.ToNoteResponses(notes), nil
+	return dtosV1.ToNoteResponses(notes), total, nil
 }
 
 func (s *NotesService) GetNote(ctx context.Context, id int) (*dtosV1.NoteResponse, error) {

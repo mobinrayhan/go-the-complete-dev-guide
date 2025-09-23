@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -22,7 +23,9 @@ func NewNotesHandler(s *service.NotesService) *NotesHandler {
 }
 
 func (h *NotesHandler) GetNotesHandler(ctx *gin.Context) {
-	notes, err := h.s.GetNotes(ctx.Request.Context())
+	notes, total, err := h.s.GetNotes(ctx.Request.Context())
+
+	fmt.Println(err)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, dtos.ApiResponseList[[]dtosV1.NoteResponse]{
@@ -37,7 +40,7 @@ func (h *NotesHandler) GetNotesHandler(ctx *gin.Context) {
 		Data:    notes,
 		Message: "Get All Notes Successfully!",
 		Meta: &dtos.ResponseMeta{
-			Total:    len(notes),
+			Total:    total,
 			Page:     10,
 			PerPages: 5,
 			Limit:    20,
