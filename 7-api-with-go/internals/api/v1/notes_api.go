@@ -10,6 +10,7 @@ func RegisterNotesRoutes(routes *gin.RouterGroup, h handler.NotesHandler) {
 
 	{
 		notes.GET("/", h.GetNotesHandler)
+		notes.POST("/random-notes", h.CreateDummyNotesHandler)
 		notes.GET("/:id", h.GetNoteHandler)
 	}
 }

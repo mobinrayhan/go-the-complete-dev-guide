@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	ErrNoteNotFound     = errors.New("note not found")
-	ErrNotesFetchFailed = errors.New("failed to fetch notes")
+	ErrNoteNotFound       = errors.New("note not found")
+	ErrNotesFetchFailed   = errors.New("failed to fetch notes")
+	ErrorDummyNotesInsert = errors.New("failed to insert dummy notes")
 )
 
 type NotesService struct {
@@ -25,8 +26,8 @@ func NewNotesService(r *repository.NotesRepo) *NotesService {
 	}
 }
 
-func (s *NotesService) GetNotes(ctx context.Context) ([]dtosV1.NoteResponse, int, error) {
-	notes, total, err := s.r.FetchNotes(ctx)
+func (s *NotesService) GetNotes(ctx context.Context, skip, perPage int) ([]dtosV1.NoteResponse, int, error) {
+	notes, total, err := s.r.FetchNotes(ctx, skip, perPage)
 
 	if err != nil {
 		return nil, total, fmt.Errorf("%w : %v", ErrNotesFetchFailed, err)
@@ -49,4 +50,14 @@ func (s *NotesService) GetNote(ctx context.Context, id int) (*dtosV1.NoteRespons
 	noteRes := dtosV1.ToNoteResponse(*note)
 
 	return &noteRes, nil
+}
+func (s *NotesService) CreateDummyNotes(ctx context.Context, size int) error {
+
+	err := s.r.PostDummyNotes(ctx, size)
+
+	if err != nil {
+		return fmt.Errorf("create dummy notes failed: %w", err)
+	}
+
+	return nil
 }

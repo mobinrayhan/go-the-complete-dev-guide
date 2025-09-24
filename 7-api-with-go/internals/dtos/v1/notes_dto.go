@@ -11,3 +11,7 @@ type NoteResponse struct {
 	CreatedAt time.Time   `json:"createdAt,omitempty"`
 	UpdatedAt time.Time   `json:"updatedAt,omitempty"`
 }
+
+type DummyNoteRequest struct {
+	Size int `json:"size,omitempty" binding:"required" validate:"min=1"`
+}
