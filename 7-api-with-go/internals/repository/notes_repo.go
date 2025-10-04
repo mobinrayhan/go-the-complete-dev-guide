@@ -11,6 +11,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"mobin.dev/internals/model"
+	"mobin.dev/pkg/pagination"
 )
 
 type NotesRepo struct {
@@ -23,25 +24,31 @@ func NewNotesRepo(db *sql.DB) *NotesRepo {
 	}
 }
 
-func (r *NotesRepo) FetchNotes(ctx context.Context, skip, perPage int) ([]model.Note, int, error) {
-	var total int
-	totalRows := r.db.QueryRowContext(ctx, `SELECT COUNT(*) AS total FROM notes`)
+func (r *NotesRepo) FetchNotes(ctx context.Context, cursor pagination.Cursor, limit int) ([]model.Note, bool, error) {
+	baseQuery := `SELECT id, user_id, title, body, tags, created_at, updated_at FROM notes `
 
-	if err := totalRows.Scan(&total); err != nil {
-		return nil, 0, fmt.Errorf("failed to scan total rows : %w", err)
+	var args []interface{}
+	var whereClause string
+
+	query := baseQuery
+
+	if !cursor.IsEmpty() {
+		whereClause = `WHERE (created_at, id) < ($1, $2)`
+		args = append(args, cursor.CreateAt, cursor.Id)
+	}
+	if whereClause != "" {
+		query += whereClause + " ORDER BY created_at DESC, id DESC LIMIT $3"
+	} else {
+		query += ` ORDER BY created_at DESC, id DESC LIMIT $1`
 	}
 
-	rows, err := r.db.QueryContext(ctx, `
-				SELECT id, user_id, title, body, tags, created_at, updated_at
-					FROM notes
-					ORDER BY id ASC
-				LIMIT $1 OFFSET $2
-		`, perPage, skip)
+	args = append(args, limit)
 
-	fmt.Println(perPage, skip)
+	fmt.Println(query, args)
+	rows, err := r.db.QueryContext(ctx, query, args...)
 
 	if err != nil {
-		return nil, total, fmt.Errorf("failed to query db data %w ", err)
+		return nil, false, fmt.Errorf("failed to query db data %w ", err)
 	}
 
 	defer rows.Close()
@@ -53,21 +60,29 @@ func (r *NotesRepo) FetchNotes(ctx context.Context, skip, perPage int) ([]model.
 		var tags json.RawMessage
 
 		if err := rows.Scan(&note.Id, &note.UserId, &note.Title, &note.Body, &tags, &note.CreatedAt, &note.UpdatedAt); err != nil {
-			return nil, total, fmt.Errorf("failed to scan rows : %w", err)
+			return nil, false, fmt.Errorf("failed to scan rows : %w", err)
 		}
 
 		err := json.Unmarshal(tags, &note.Tags)
 		if err != nil {
-			return nil, total, fmt.Errorf("error unmarshalling JSON : %w", err)
+			return nil, false, fmt.Errorf("error unmarshalling JSON : %w", err)
 		}
 		notes = append(notes, note)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, total, fmt.Errorf("row iteration error: %w", err)
+		return nil, false, fmt.Errorf("row iteration error: %w", err)
 	}
 
-	return notes, total, nil
+	nextRowCount := 0
+	row := r.db.QueryRowContext(ctx, `SELECT COUNT(1) FROM notes WHERE id = $1`, notes[len(notes)-1].Id)
+	err = row.Scan(&nextRowCount)
+
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to scan row : %w ", err)
+	}
+
+	return notes, nextRowCount == 1, nil
 }
 
 func (r *NotesRepo) FetchNote(ctx context.Context, id int) (*model.Note, error) {

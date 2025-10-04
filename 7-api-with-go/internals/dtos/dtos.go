@@ -1,6 +1,6 @@
 package dtos
 
-type ResponseMeta struct {
+type OffsetBasedResponseMeta struct {
 	Total      int  `json:"total,omitempty"`
 	PerPage    int  `json:"perPage,omitempty"`
 	Page       int  `json:"page,omitempty"`
@@ -8,11 +8,21 @@ type ResponseMeta struct {
 	HasNext    bool `json:"hasNext"`
 	HasPrev    bool `json:"hasPrev"`
 }
-type ApiResponseList[T any] struct {
-	Success bool          `json:"success,omitempty"`
-	Data    T             `json:"data"`
-	Message string        `json:"message,omitempty"`
-	Meta    *ResponseMeta `json:"meta,omitempty"`
+
+type CursorBasedResponseMeta struct {
+	NextCursor string `json:"nextCursor,omitempty"`
+	// PrevCursor    string `json:"prevCursor,omitempty"`
+	HasNext bool `json:"hasNext"`
+	// HasPrev       bool   `json:"hasPrev"`
+	Limit         int `json:"limit,omitempty"`
+	ReturnedCount int `json:"returnedCount,omitempty"`
+}
+
+type ApiResponseList[T any, U any] struct {
+	Success bool   `json:"success,omitempty"`
+	Data    T      `json:"data"`
+	Message string `json:"message,omitempty"`
+	Meta    *U     `json:"meta,omitempty"`
 }
 
 type ApiResponseSingle[T any] struct {

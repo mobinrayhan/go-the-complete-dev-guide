@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"math"
 	"net/http"
 	"strconv"
 
@@ -11,6 +10,7 @@ import (
 	dtosV1 "mobin.dev/internals/dtos/v1"
 	"mobin.dev/internals/service"
 	"mobin.dev/pkg/constants"
+	"mobin.dev/pkg/pagination"
 )
 
 type NotesHandler struct {
@@ -24,56 +24,53 @@ func NewNotesHandler(s *service.NotesService) *NotesHandler {
 }
 
 func (h *NotesHandler) GetNotesHandler(ctx *gin.Context) {
-	page, errPage := strconv.Atoi(ctx.DefaultQuery("page", strconv.Itoa(constants.DefaultPage)))
+	limit, errPage := strconv.Atoi(ctx.DefaultQuery("limit", strconv.Itoa(constants.DefaultLimit)))
+	cursorStr := ctx.DefaultQuery("cursor", "")
 
-	if errPage != nil || page <= 0 {
-		ctx.JSON(http.StatusBadRequest, dtos.ApiResponseList[[]dtosV1.NoteResponse]{
+	if errPage != nil || limit <= 0 {
+		ctx.JSON(http.StatusBadRequest, dtos.ApiResponseList[[]dtosV1.NoteResponse, dtos.CursorBasedResponseMeta]{
 			Success: false,
-			Message: "Invalid 'Page' Query Params!",
+			Message: "Invalid 'limit' Query Params!",
 		})
 		return
 	}
-	perPage, errPerPage := strconv.Atoi(ctx.DefaultQuery("perPage", strconv.Itoa(constants.DefaultPerPage)))
 
-	if errPerPage != nil || perPage <= 0 {
-		ctx.JSON(http.StatusBadRequest, dtos.ApiResponseList[[]dtosV1.NoteResponse]{
-			Success: false,
-			Message: "Invalid 'Per Page' Query Params!",
-		})
-		return
-	}
-	skip := (page - 1) * perPage
-
-	if perPage > constants.MaxPerPage {
-		perPage = constants.MaxPerPage
+	if limit > constants.MaxPerPage {
+		limit = constants.MaxPerPage
 	}
 
-	notes, total, err := h.s.GetNotes(ctx.Request.Context(), skip, perPage)
+	var cursor pagination.Cursor
+
+	if cursorStr == "" {
+		cursor = pagination.Cursor{}
+	} else {
+		c, err := pagination.DecodeCursor(cursorStr)
+
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, dtos.ApiResponseList[[]dtosV1.NoteResponse, dtos.CursorBasedResponseMeta]{
+				Success: false,
+				Message: "Invalid Cursor",
+			})
+			return
+		}
+		cursor = c
+	}
+
+	notes, meta, err := h.s.GetNotes(ctx.Request.Context(), cursor, limit)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.ApiResponseList[[]dtosV1.NoteResponse]{
+		ctx.JSON(http.StatusBadRequest, dtos.ApiResponseList[[]dtosV1.NoteResponse, dtos.CursorBasedResponseMeta]{
 			Success: false,
 			Message: "Failed To Fetch Notes!",
 		})
 		return
 	}
 
-	totalPages := int(math.Ceil(float64(total) / float64(perPage)))
-	hasNext := totalPages > page
-	hasPrev := page > 1
-	metaData := dtos.ResponseMeta{
-		Total:      total,
-		PerPage:    perPage,
-		Page:       page,
-		TotalPages: totalPages,
-		HasNext:    hasNext,
-		HasPrev:    hasPrev,
-	}
-	ctx.JSON(http.StatusOK, dtos.ApiResponseList[[]dtosV1.NoteResponse]{
+	ctx.JSON(http.StatusOK, dtos.ApiResponseList[[]dtosV1.NoteResponse, dtos.CursorBasedResponseMeta]{
 		Success: true,
 		Data:    notes,
 		Message: "Get Notes Successfully!",
-		Meta:    &metaData,
+		Meta:    meta,
 	})
 }
 

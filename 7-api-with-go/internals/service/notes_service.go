@@ -6,8 +6,10 @@ import (
 	"errors"
 	"fmt"
 
+	"mobin.dev/internals/dtos"
 	dtosV1 "mobin.dev/internals/dtos/v1"
 	"mobin.dev/internals/repository"
+	"mobin.dev/pkg/pagination"
 )
 
 var (
@@ -26,14 +28,30 @@ func NewNotesService(r *repository.NotesRepo) *NotesService {
 	}
 }
 
-func (s *NotesService) GetNotes(ctx context.Context, skip, perPage int) ([]dtosV1.NoteResponse, int, error) {
-	notes, total, err := s.r.FetchNotes(ctx, skip, perPage)
+func (s *NotesService) GetNotes(ctx context.Context, cursor pagination.Cursor, limit int) ([]dtosV1.NoteResponse, *dtos.CursorBasedResponseMeta, error) {
+	notes, hasNext, err := s.r.FetchNotes(ctx, cursor, limit)
 
+	fmt.Println(err)
 	if err != nil {
-		return nil, total, fmt.Errorf("%w : %v", ErrNotesFetchFailed, err)
+		return nil, &dtos.CursorBasedResponseMeta{}, fmt.Errorf("%w : %v", ErrNotesFetchFailed, err)
 	}
 
-	return dtosV1.ToNoteResponses(notes), total, nil
+	var nextCursor string
+
+	if len(notes) == limit {
+		last := notes[len(notes)-1]
+		newCursor := pagination.Cursor{CreateAt: last.CreatedAt, Id: last.Id}
+		nextCursor, _ = pagination.EncodeCursor(newCursor)
+	}
+
+	meta := &dtos.CursorBasedResponseMeta{
+		Limit:         limit,
+		HasNext:       hasNext,
+		NextCursor:    nextCursor,
+		ReturnedCount: len(notes),
+	}
+
+	return dtosV1.ToNoteResponses(notes), meta, nil
 }
 
 func (s *NotesService) GetNote(ctx context.Context, id int) (*dtosV1.NoteResponse, error) {
